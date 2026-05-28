@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Build-a-Lifeform Trait Generator</title>
+  <style>
+    :root {
+      --vc-red: #bf311a;
+      --vc-dark-red: #8f2415;
+      --vc-gold: #f2b705;
+      --ink: #1f2937;
+      --muted: #5f6b7a;
+      --soft: #fff8f4;
+      --card: #ffffff;
+      --border: #ead8cf;
+      --success: #1f7a4d;
+      --shadow: 0 12px 28px rgba(31, 41, 55, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #fff, var(--soft));
+      color: var(--ink);
+      line-height: 1.5;
+    }
+
+    .wrap {
+      max-width: 950px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, var(--vc-dark-red), var(--vc-red));
+      color: #fff;
+      padding: 28px;
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+    }
+
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      line-height: 1.05;
+    }
+
+    .hero p { margin: 0; max-width: 760px; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+
+    .question {
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+      margin-top: 16px;
+    }
+
+    .question:first-child {
+      border-top: 0;
+      padding-top: 0;
+      margin-top: 0;
+    }
+
+    h2, h3 { color: var(--vc-dark-red); }
+    h2 { margin-top: 0; }
+
+    label {
+      display: block;
+      padding: 12px 14px;
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      margin: 8px 0;
+      cursor: pointer;
+      background: #fff;
+      font-weight: 700;
+    }
+
+    label:hover {
+      border-color: var(--vc-gold);
+      background: #fff9e8;
+    }
+
+    input[type="radio"] { margin-right: 10px; }
+
+    button {
+      border: 0;
+      border-radius: 999px;
+      padding: 13px 18px;
+      background: var(--vc-red);
+      color: #fff;
+      font-weight: 800;
+      cursor: pointer;
+      font-size: 1rem;
+      box-shadow: 0 10px 20px rgba(191, 49, 26, 0.18);
+      margin: 8px 8px 8px 0;
+    }
+
+    button.secondary {
+      background: #f8eee9;
+      color: var(--vc-dark-red);
+      border: 1px solid var(--border);
+      box-shadow: none;
+    }
+
+    .result {
+      display: none;
+      border: 3px solid var(--vc-gold);
+      background: #fffdf3;
+    }
+
+    .result.show { display: block; }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin: 14px 0;
+    }
+
+    .mini {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .mini strong {
+      display: block;
+      color: var(--vc-dark-red);
+      margin-bottom: 6px;
+    }
+
+    .prompt-box, .copy-box {
+      background: #f8fafc;
+      border: 1px solid #d9e2ec;
+      border-radius: 16px;
+      padding: 14px;
+      white-space: pre-wrap;
+      margin-top: 12px;
+    }
+
+    .error {
+      display: none;
+      color: #8a1f11;
+      background: #fff1f1;
+      border: 1px solid #ffc9c9;
+      padding: 12px;
+      border-radius: 14px;
+      font-weight: 700;
+      margin: 12px 0;
+    }
+
+    .small { color: var(--muted); font-size: 0.95rem; }
+
+    @media (max-width: 780px) {
+      .result-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero">
+      <h1>Build-a-Lifeform Trait Generator</h1>
+      <p>Answer the questions below to generate your unique organism conditions. You will use these results to create your AI illustration and discussion post.</p>
+    </section>
+
+    <section class="card">
+      <h2>Step 1: Answer the Trait Questions</h2>
+      <p class="small">There are no wrong answers. Choose the option that best fits you. Your answers will generate your organism's environment, survival challenge, biological limitation, and special trait.</p>
+
+      <form id="traitForm">
+        <div class="question">
+          <h3>1. Which environment feels most comfortable to you?</h3>
+          <label><input type="radio" name="q1" value="1"> Beach or ocean</label>
+          <label><input type="radio" name="q1" value="2"> Hot desert or sunny open space</label>
+          <label><input type="radio" name="q1" value="3"> Cold mountains or winter weather</label>
+          <label><input type="radio" name="q1" value="4"> Busy city or crowded environment</label>
+        </div>
+
+        <div class="question">
+          <h3>2. Which trait best describes your survival strength?</h3>
+          <label><input type="radio" name="q2" value="1"> Adaptable</label>
+          <label><input type="radio" name="q2" value="2"> Physically strong or persistent</label>
+          <label><input type="radio" name="q2" value="3"> Strategic and analytical</label>
+          <label><input type="radio" name="q2" value="4"> Social and cooperative</label>
+        </div>
+
+        <div class="question">
+          <h3>3. Which best describes your energy style?</h3>
+          <label><input type="radio" name="q3" value="slow"> Slow and steady</label>
+          <label><input type="radio" name="q3" value="burst"> Short bursts of energy</label>
+          <label><input type="radio" name="q3" value="active"> Constantly active</label>
+          <label><input type="radio" name="q3" value="variable"> Energy changes throughout the day</label>
+        </div>
+
+        <div class="question">
+          <h3>4. How do you usually respond to stress?</h3>
+          <label><input type="radio" name="q4" value="1"> Withdraw quietly and conserve energy</label>
+          <label><input type="radio" name="q4" value="2"> Push through physically</label>
+          <label><input type="radio" name="q4" value="3"> Analyze, plan, and problem-solve</label>
+          <label><input type="radio" name="q4" value="4"> Seek support from others</label>
+        </div>
+
+        <div class="question">
+          <h3>5. Which food type do you enjoy most?</h3>
+          <label><input type="radio" name="q5" value="salt"> Salty foods</label>
+          <label><input type="radio" name="q5" value="sweet"> Sweet foods</label>
+          <label><input type="radio" name="q5" value="protein"> Protein-rich foods</label>
+          <label><input type="radio" name="q5" value="fresh"> Fresh fruits or vegetables</label>
+        </div>
+
+        <div class="question">
+          <h3>6. Which best describes your sleep pattern?</h3>
+          <label><input type="radio" name="q6" value="early"> Early sleeper</label>
+          <label><input type="radio" name="q6" value="night"> Night owl</label>
+          <label><input type="radio" name="q6" value="inconsistent"> Inconsistent schedule</label>
+          <label><input type="radio" name="q6" value="structured"> Very structured routine</label>
+        </div>
+
+        <div class="error" id="errorMsg">Please answer every question before generating your lifeform conditions.</div>
+        <button type="button" onclick="generateLifeform()">Generate My Lifeform Conditions</button>
+        <button type="button" class="secondary" onclick="resetGenerator()">Reset</button>
+      </form>
+    </section>
+
+    <section class="card result" id="resultCard">
+      <h2>Step 2: Your Lifeform Conditions</h2>
+      <p>Use these exact conditions for your AI image prompt and your Canvas discussion post.</p>
+
+      <div class="result-grid">
+        <div class="mini"><strong>Total Trait Score</strong><span id="scoreOut"></span></div>
+        <div class="mini"><strong>Environment</strong><span id="environmentOut"></span></div>
+        <div class="mini"><strong>Survival Challenge</strong><span id="challengeOut"></span></div>
+        <div class="mini"><strong>Biological Limitation</strong><span id="limitationOut"></span></div>
+        <div class="mini"><strong>Macromolecule Focus</strong><span id="macroOut"></span></div>
+        <div class="mini"><strong>Special Adaptation Trait</strong><span id="traitOut"></span></div>
+      </div>
+
+      <h3>Copy This Into Your Discussion Post</h3>
+      <div class="copy-box" id="copySummary"></div>
+
+      <h3>Starter AI Image Prompt</h3>
+      <p class="small">You may revise this prompt, but your final image should still match your assigned conditions.</p>
+      <div class="prompt-box" id="promptOut"></div>
+      <button type="button" onclick="copyPrompt()">Copy Prompt</button>
+      <button type="button" class="secondary" onclick="window.print()">Print / Save Results</button>
+    </section>
+  </main>
+
+  <script>
+    function getChecked(name) {
+      const selected = document.querySelector(`input[name="${name}"]:checked`);
+      return selected ? selected.value : null;
+    }
+
+    function environmentFromScore(score) {
+      if (score <= 9) return 'Deep ocean trench with crushing pressure and no sunlight';
+      if (score <= 13) return 'Desert planet with extreme heat and limited water';
+      if (score <= 17) return 'Frozen moon with extreme cold and low available energy';
+      if (score <= 21) return 'Toxic acidic swamp with unstable chemical conditions';
+      return 'High-radiation wasteland with frequent DNA damage risk';
+    }
+
+    function challengeFromEnergy(value) {
+      const map = {
+        slow: 'Low food availability; survival requires energy conservation',
+        burst: 'Extreme predators; survival requires rapid escape or defense',
+        active: 'Low oxygen environment; survival requires efficient energy use',
+        variable: 'Unstable climate conditions; survival requires flexibility'
+      };
+      return map[value];
+    }
+
+    function limitationFromSleep(value) {
+      const map = {
+        early: 'Poor heat retention',
+        night: 'Fragile proteins that denature easily',
+        inconsistent: 'DNA damage occurs easily',
+        structured: 'Weak membrane flexibility'
+      };
+      return map[value];
+    }
+
+    function macroFromFood(value) {
+      const map = {
+        salt: 'Lipids and membrane stability in a chemically stressful environment',
+        sweet: 'Carbohydrates for energy storage and structural support',
+        protein: 'Proteins for enzymes, transport, movement, and homeostasis',
+        fresh: 'Nucleic acids and DNA/RNA protection for long-term survival'
+      };
+      return map[value];
+    }
+
+    function traitFromStress(value) {
+      const map = {
+        1: 'Conserves energy by slowing metabolism during stress',
+        2: 'Uses structural support and protective tissues to withstand stress',
+        3: 'Uses chemical sensing and regulatory proteins to respond to change',
+        4: 'Uses cooperative behavior or signaling molecules to survive in groups'
+      };
+      return map[value];
+    }
+
+    function generateLifeform() {
+      const q1 = getChecked('q1');
+      const q2 = getChecked('q2');
+      const q3 = getChecked('q3');
+      const q4 = getChecked('q4');
+      const q5 = getChecked('q5');
+      const q6 = getChecked('q6');
+
+      if (!q1 || !q2 || !q3 || !q4 || !q5 || !q6) {
+        document.getElementById('errorMsg').style.display = 'block';
+        return;
+      }
+
+      document.getElementById('errorMsg').style.display = 'none';
+
+      const score = Number(q1) + Number(q2) + Number(q4);
+      const adjustedScore = score + (q3 === 'slow' ? 1 : q3 === 'burst' ? 2 : q3 === 'active' ? 3 : 4) + (q5 === 'salt' ? 1 : q5 === 'sweet' ? 2 : q5 === 'protein' ? 3 : 4) + (q6 === 'early' ? 1 : q6 === 'night' ? 2 : q6 === 'inconsistent' ? 3 : 4);
+
+      const environment = environmentFromScore(adjustedScore);
+      const challenge = challengeFromEnergy(q3);
+      const limitation = limitationFromSleep(q6);
+      const macro = macroFromFood(q5);
+      const trait = traitFromStress(q4);
+
+      document.getElementById('scoreOut').textContent = adjustedScore;
+      document.getElementById('environmentOut').textContent = environment;
+      document.getElementById('challengeOut').textContent = challenge;
+      document.getElementById('limitationOut').textContent = limitation;
+      document.getElementById('macroOut').textContent = macro;
+      document.getElementById('traitOut').textContent = trait;
+
+      const summary = `My assigned lifeform conditions:\nEnvironment: ${environment}\nSurvival Challenge: ${challenge}\nBiological Limitation: ${limitation}\nMacromolecule Focus: ${macro}\nSpecial Adaptation Trait: ${trait}`;
+
+      const prompt = `Create a biologically realistic original lifeform adapted to this environment: ${environment}. The organism must survive this challenge: ${challenge}. It also has this biological limitation: ${limitation}. Visually show adaptations related to this macromolecule focus: ${macro}. Include this special adaptation trait: ${trait}. The organism should look scientifically plausible rather than fantasy-based. Show visible features that could be explained using carbohydrates, lipids, proteins, nucleic acids, and functional groups. Do not include text labels in the image.`;
+
+      document.getElementById('copySummary').textContent = summary;
+      document.getElementById('promptOut').textContent = prompt;
+      document.getElementById('resultCard').classList.add('show');
+      document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function copyPrompt() {
+      const text = document.getElementById('promptOut').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Prompt copied.');
+      });
+    }
+
+    function resetGenerator() {
+      document.getElementById('traitForm').reset();
+      document.getElementById('resultCard').classList.remove('show');
+      document.getElementById('errorMsg').style.display = 'none';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
